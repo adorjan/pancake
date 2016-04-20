@@ -3,7 +3,7 @@ package io.github.pancake.facade;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import io.github.pancake.factory.PancakeFactory;
 import io.github.pancake.persistence.base.Pancake;
@@ -13,7 +13,7 @@ import io.github.pancake.persistence.base.Pancake;
  * 
  * @author Adorjan Nagy
  */
-@Component
+@Service
 public class PancakeFacade {
     private final PancakeFactory pancakeFactory;
 
