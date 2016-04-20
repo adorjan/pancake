@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import io.github.pancake.configuration.PancakeConfiguration;
 import io.github.pancake.facade.PancakeFacade;
 import io.github.pancake.persistence.base.Pancake;
 
@@ -26,12 +26,12 @@ import io.github.pancake.persistence.base.Pancake;
 @WebServlet("/OrderConfirmationServlet")
 public class OrderConfirmationServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private AnnotationConfigApplicationContext context;
+    private ApplicationContext context;
     private PancakeFacade pancakeFacade;
 
     @Override
     public void init() {
-        context = new AnnotationConfigApplicationContext(PancakeConfiguration.class);
+        context = new ClassPathXmlApplicationContext("conf/spring/application-context.xml");
         setPancakeFacade(context.getBean(PancakeFacade.class));
     }
 
