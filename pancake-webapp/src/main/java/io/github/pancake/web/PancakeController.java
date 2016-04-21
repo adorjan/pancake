@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import io.github.pancake.persistence.base.Pancake;
  */
 @Controller
 public class PancakeController {
+    private final Logger logger = LoggerFactory.getLogger(PancakeController.class);
     private final PancakeFacade pancakeFacade;
 
     /**
@@ -43,7 +46,11 @@ public class PancakeController {
     protected ModelAndView orderConfirmation(HttpServletRequest request) {
         ModelAndView model = new ModelAndView();
         model.setViewName("orderconfirmation");
-        model.addObject("orderedPancakes", getOrderedPancakes(request));
+        Map<String, String> orderedPancakes = getOrderedPancakes(request);
+        model.addObject("orderedPancakes", orderedPancakes);
+        if(!orderedPancakes.isEmpty()) {
+            logger.info("Pancake order [{}] arrived from e-mail address [{}].", orderedPancakes, request.getParameter("eMailAddress"));
+        }
         return model;
     }
 
