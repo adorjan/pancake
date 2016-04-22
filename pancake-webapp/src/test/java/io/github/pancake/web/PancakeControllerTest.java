@@ -35,15 +35,17 @@ public class PancakeControllerTest {
     @Mock
     private Logger mockLogger;
     @Mock
+    private PancakeOrderValidator mockPancakeOrderValidator;
+    @Mock
     private ModelAndView mockModelAndView;
-    private Map<String, String> orderedPancakes;
+    private Map<Pancake, String> orderedPancakes;
     private List<Pancake> pancakes;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         underTest = new PancakeController(mockPanckakeFacade);
-        orderedPancakes = new HashMap<String, String>();
+        orderedPancakes = new HashMap<Pancake, String>();
         pancakes = new ArrayList<Pancake>();
     }
 
@@ -59,19 +61,21 @@ public class PancakeControllerTest {
     @Test
     public void testOrderConfirmationShouldAddOrderedPancakesToModelWhenInvoked() {
         // GIVEN in setUp
+        Mockito.when(mockPancakeOrderValidator.getValidPancakeOrder(orderedPancakes)).thenReturn(orderedPancakes);
         // WHEN
-        underTest.orderConfirmation(mockModelAndView, mockRequest);
+        underTest.orderConfirmation(mockModelAndView, mockRequest, mockPancakeOrderValidator);
         // THEN
         verify(mockModelAndView, atLeastOnce()).addObject("orderedPancakes", orderedPancakes);
     }
 
     @Test
-    public void testOrderConfirmationShouldWriteIntoLogWhenInvoked() {
+    public void testOrderConfirmationShouldWriteIntoLogWhenAPancakeOrderArrives() {
         // GIVEN
         underTest.setLogger(mockLogger);
         // WHEN
-        underTest.orderConfirmation(mockModelAndView, mockRequest);
+        underTest.orderConfirmation(mockModelAndView, mockRequest, mockPancakeOrderValidator);
         // THEN
-        verify(mockLogger, atLeastOnce()).info(Mockito.eq("Pancake order [{}] arrived from e-mail address [{}]."), Mockito.any(), Mockito.anyString());
+        verify(mockLogger, atLeastOnce()).info(Mockito.eq("Pancake order [{}] arrived from e-mail address [{}]."), Mockito.any(),
+                Mockito.anyString());
     }
 }

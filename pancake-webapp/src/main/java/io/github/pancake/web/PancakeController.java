@@ -42,26 +42,20 @@ public class PancakeController {
     }
 
     @RequestMapping(value = "/orderconfirmation", method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView orderConfirmation(ModelAndView model, HttpServletRequest request) {
+    protected ModelAndView orderConfirmation(ModelAndView model, HttpServletRequest request, PancakeOrderValidator pancakeOrderValidator) {
         model.setViewName("orderconfirmation");
-        Map<String, String> orderedPancakes = getOrderedPancakes(request);
-        model.addObject("orderedPancakes", orderedPancakes);
-        if(!orderedPancakes.isEmpty()) {
-            logger.info("Pancake order [{}] arrived from e-mail address [{}].", orderedPancakes, request.getParameter("eMailAddress"));
-        }
+        Map<Pancake, String> pancakeOrder = getPancakeOrder(request, pancakeOrderValidator);
+        model.addObject("orderedPancakes", pancakeOrder);
+        logger.info("Pancake order [{}] arrived from e-mail address [{}].", pancakeOrder, request.getParameter("eMailAddress"));
         return model;
     }
 
-    private Map<String, String> getOrderedPancakes(HttpServletRequest request) {
-        Map<String, String> orderedPancakes = new HashMap<String, String>();
+    Map<Pancake, String> getPancakeOrder(HttpServletRequest request, PancakeOrderValidator pancakeOrderValidator) {
+        Map<Pancake, String> pancakeOrder = new HashMap<Pancake, String>();
         for (Pancake pancake : pancakeFacade.getOrderablePancakes()) {
-            String pancakeType = pancake.toString();
-            String pancakeAmount = request.getParameter(pancakeType);
-            if (pancakeAmount != null && pancakeAmount != "") {
-                orderedPancakes.put(pancakeType, pancakeAmount);
-            }
+            pancakeOrder.put(pancake, request.getParameter(pancake.toString()));
         }
-        return orderedPancakes;
+        return pancakeOrderValidator.getValidPancakeOrder(pancakeOrder);
     }
 
     void setLogger(Logger logger) {
