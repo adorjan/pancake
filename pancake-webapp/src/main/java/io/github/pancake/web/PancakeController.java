@@ -23,7 +23,7 @@ import io.github.pancake.persistence.base.Pancake;
  */
 @Controller
 public class PancakeController {
-    private final Logger logger = LoggerFactory.getLogger(PancakeController.class);
+    private Logger logger = LoggerFactory.getLogger(PancakeController.class);
     private final PancakeFacade pancakeFacade;
 
     /**
@@ -35,16 +35,14 @@ public class PancakeController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    protected ModelAndView order() {
-        ModelAndView model = new ModelAndView();
+    protected ModelAndView order(ModelAndView model) {
         model.setViewName("order");
         model.addObject("pancakes", pancakeFacade.getOrderablePancakes());
         return model;
     }
 
     @RequestMapping(value = "/orderconfirmation", method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView orderConfirmation(HttpServletRequest request) {
-        ModelAndView model = new ModelAndView();
+    protected ModelAndView orderConfirmation(ModelAndView model, HttpServletRequest request) {
         model.setViewName("orderconfirmation");
         Map<String, String> orderedPancakes = getOrderedPancakes(request);
         model.addObject("orderedPancakes", orderedPancakes);
@@ -64,5 +62,9 @@ public class PancakeController {
             }
         }
         return orderedPancakes;
+    }
+
+    void setLogger(Logger logger) {
+        this.logger = logger;
     }
 }
