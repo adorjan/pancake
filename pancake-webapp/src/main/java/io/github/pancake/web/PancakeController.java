@@ -1,6 +1,5 @@
 package io.github.pancake.web;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import io.github.pancake.facade.PancakeFacade;
+import io.github.pancake.facade.PancakeOrderFacade;
 import io.github.pancake.persistence.base.Pancake;
 
 /**
@@ -25,13 +25,16 @@ import io.github.pancake.persistence.base.Pancake;
 public class PancakeController {
     private Logger logger = LoggerFactory.getLogger(PancakeController.class);
     private final PancakeFacade pancakeFacade;
+    private final PancakeOrderFacade pancakeOrderFacade;
 
     /**
-    * @param pancakeFacade
-    */
+     * @param pancakeFacade
+     * @param pancakeOrderFacade
+     */
     @Autowired
-    public PancakeController(PancakeFacade pancakeFacade) {
+    public PancakeController(PancakeFacade pancakeFacade, PancakeOrderFacade pancakeOrderFacade) {
         this.pancakeFacade = pancakeFacade;
+        this.pancakeOrderFacade = pancakeOrderFacade;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -42,20 +45,12 @@ public class PancakeController {
     }
 
     @RequestMapping(value = "/orderconfirmation", method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView orderConfirmation(ModelAndView model, HttpServletRequest request, PancakeOrderValidator pancakeOrderValidator) {
+    protected ModelAndView orderConfirmation(ModelAndView model, HttpServletRequest request) {
         model.setViewName("orderconfirmation");
-        Map<Pancake, String> pancakeOrder = getPancakeOrder(request, pancakeOrderValidator);
-        model.addObject("orderedPancakes", pancakeOrder);
-        logger.info("Pancake order [{}] arrived from e-mail address [{}].", pancakeOrder, request.getParameter("eMailAddress"));
+        Map<Pancake, String> orderedPancakes = pancakeOrderFacade.getNonZeroPancakeOrder(request);
+        model.addObject("orderedPancakes", orderedPancakes);
+        logger.info("Pancake order [{}] arrived from e-mail address [{}].", orderedPancakes, request.getParameter("eMailAddress"));
         return model;
-    }
-
-    Map<Pancake, String> getPancakeOrder(HttpServletRequest request, PancakeOrderValidator pancakeOrderValidator) {
-        Map<Pancake, String> pancakeOrder = new HashMap<Pancake, String>();
-        for (Pancake pancake : pancakeFacade.getOrderablePancakes()) {
-            pancakeOrder.put(pancake, request.getParameter(pancake.toString()));
-        }
-        return pancakeOrderValidator.getValidPancakeOrder(pancakeOrder);
     }
 
     void setLogger(Logger logger) {
