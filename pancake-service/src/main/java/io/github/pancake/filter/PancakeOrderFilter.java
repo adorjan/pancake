@@ -18,9 +18,6 @@ import io.github.pancake.persistence.base.Pancake;
 public class PancakeOrderFilter {
     private static final String ZERO = "0";
 
-    public PancakeOrderFilter() {
-    }
-
     public Map<Pancake, String> getNonZeroPancakeOrder(Map<Pancake, String> pancakesWithAmounts) {
         Map<Pancake, String> pancakesWithNonZeroAmounts = new HashMap<Pancake, String>();
         for (Pancake pancake : pancakesWithAmounts.keySet()) {
